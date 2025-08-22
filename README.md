@@ -18,21 +18,27 @@
 
 ## Setup
 
-```bash
-docker network create postgresql-network
-docker network create redis-network
-docker network create minio-network
+1. Setup Project using Docker
+    ```bash
+    docker network create postgresql-network
+    docker network create redis-network
+    docker network create minio-network
 
-sudo docker compose \
-    -f docker-compose-psql.yaml \
-    --env-file .psql.env \
-    -f docker-compose-minio.yaml \
-    --env-file .minio.env \
-    -f docker-compose-bare.yaml \
-    --env-file .airflow.env \
-    -f docker-compose-redis.yaml \
-    up -d --build
-```
+    sudo docker compose \
+        -f docker-compose-psql.yaml \
+        --env-file .psql.env \
+        -f docker-compose-minio.yaml \
+        --env-file .minio.env \
+        -f docker-compose-bare.yaml \
+        --env-file .airflow.env \
+        -f docker-compose-redis.yaml \
+        up -d --build
+    ```
+
+## Web UIs
+
+**Airflow**: http://localhost:8080
+**MinIO Bucket**: http://localhost:9001
 
 ## Environment Variables
 
@@ -69,5 +75,18 @@ AIRFLOW_PORT=8080
 AIRFLOW_PROJ_DIR=./airflow
 AIRFLOW_UID=1000
 _PIP_ADDITIONAL_REQUIREMENTS=apache-airflow[amazon] beautifulsoup4
+AIRFLOW_CONN_MINIO_S3='{
+    "conn_type": "aws", 
+    "host": "minio", 
+    "login": "<minio_username>", 
+    "password": "<minio_password>", 
+    "schema": "http", 
+    "port": 9000, 
+    "extra": {
+        "region_name": "",
+        "endpoint_url": "http://minio:9000"
+    }
+}'
+AIRFLOW_VAR_NEWSAPI_API_KEY=<NEWSAPI_API_KEY>
 ```
 - the `postgresql-omegaserver` is container name from `docker-compose-psql.yaml`
