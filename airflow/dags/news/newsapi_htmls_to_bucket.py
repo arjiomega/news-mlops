@@ -196,7 +196,7 @@ def fetch_article_htmls_to_bucket(articles, bucket_name, aws_conn_id, object_pat
 
 
 BUCKET_NAME = "news-bucket"
-AWS_CONN_ID = "minio-s3"
+AWS_CONN_ID = "MINIO_S3"
 
 with DAG(
     dag_id='load_news_dag',
