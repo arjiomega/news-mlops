@@ -225,7 +225,6 @@ with DAG(
     # (source_name, source_type)
     news_sources = [
         ("cnn", "sources"),
-        # ("the-washington-post", "sources"), # FAILING
         ("bbc-news", "sources"),
         ("nbc-news", "sources"),
         ("al-jazeera-english", "sources"),
