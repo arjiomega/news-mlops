@@ -16,6 +16,8 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+    AIRFLOW_CONN_MINIO_S3: ${AIRFLOW_CONN_MINIO_S3:-}
+    AIRFLOW_VAR_NEWSAPI_API_KEY: ${AIRFLOW_VAR_NEWSAPI_API_KEY:-}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -25,6 +27,7 @@ x-airflow-common:
   networks:
     - postgresql-network
     - redis-network
+    - minio-network
 
 services:
   airflow-apiserver:
@@ -242,4 +245,6 @@ networks:
   postgresql-network:
     external: true
   redis-network:
+    external: true
+  minio-network:
     external: true
