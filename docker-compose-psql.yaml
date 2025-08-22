@@ -1,0 +1,27 @@
+services:
+  postgresql-omegaserver:
+    restart: always
+    image: postgres
+    container_name: postgresql_omegaserver
+    expose:
+      - "${PG_PORT}"
+    networks:
+      - postgresql-network
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DATABASE}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "${PG_PORT}", "-U", "${PG_USER}", "-d", "${PG_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  
+volumes:
+  db_data:
+
+networks:
+  postgresql-network:
+    external: true

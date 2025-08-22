@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Airflow
+airflow/logs/
+airflow/config/
+
 # Distribution / packaging
 .Python
 build/
@@ -136,6 +140,7 @@ celerybeat.pid
 
 # Environments
 .env
+*.env
 .envrc
 .venv
 env/
