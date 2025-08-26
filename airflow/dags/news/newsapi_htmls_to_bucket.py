@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
 from airflow.sdk import Variable
 from airflow.providers.amazon.aws.operators.s3 import (

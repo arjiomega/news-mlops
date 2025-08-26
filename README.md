@@ -74,7 +74,6 @@ AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/0
 AIRFLOW_PORT=8080
 AIRFLOW_PROJ_DIR=./airflow
 AIRFLOW_UID=1000
-_PIP_ADDITIONAL_REQUIREMENTS=apache-airflow[amazon] beautifulsoup4
 AIRFLOW_CONN_MINIO_S3='{
     "conn_type": "aws", 
     "host": "minio", 

@@ -1,0 +1,4 @@
+apache-airflow[amazon] 
+beautifulsoup4 
+langchain-community 
+ollama
