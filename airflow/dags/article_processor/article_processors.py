@@ -92,8 +92,8 @@ class TheVergeArticleProcessor(ArticleProcessor):
         
         article_texts = []
         for p in texts:
-            if "fv263x1" in p.get("class"):
-                break
+            if ("fv263x1" in p.get("class")) or ("fv263x4" in p.get("class")):
+                continue
             article_texts.append(p.get_text(strip=True))
 
         article_text = "\n\n".join(article_texts)
