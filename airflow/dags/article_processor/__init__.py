@@ -10,7 +10,8 @@ from article_processor.article_processors import (
     NintendoLifeArticleProcessor,
     PhoronixArticleProcessor,
     PolygonArticleProcessor,
-    TheVergeArticleProcessor
+    TheVergeArticleProcessor,
+    TomsGuideArticleProcessor
 )
 from article_processor.base import ArticleProcessor
 
@@ -31,6 +32,7 @@ def article_processor_loader(article_processor_name: str) -> ArticleProcessor:
         "phoronix": PhoronixArticleProcessor(),
         "polygon": PolygonArticleProcessor(),
         "theverge": TheVergeArticleProcessor(),
+        "tomsguide": TomsGuideArticleProcessor()
     }
     try:
         return article_processors[article_processor_name]

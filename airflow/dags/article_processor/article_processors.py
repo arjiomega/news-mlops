@@ -98,3 +98,12 @@ class TheVergeArticleProcessor(ArticleProcessor):
 
         article_text = "\n\n".join(article_texts)
         return article_text
+    
+class TomsGuideArticleProcessor(ArticleProcessor):
+    def _get_text(self, article_soup: BeautifulSoup) -> str:
+        texts = article_soup.find("div", id="article-body").find_all("p")
+        article_text = "\n\n".join(p.get_text(strip=True) for p in texts)
+        return article_text
+
+    def _get_title(self, article_soup: BeautifulSoup) -> str:
+        return article_soup.find("h1").get_text(strip=True)
