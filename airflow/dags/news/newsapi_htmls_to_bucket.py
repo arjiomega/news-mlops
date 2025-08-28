@@ -194,6 +194,19 @@ def fetch_article_htmls_to_bucket(articles, bucket_name, aws_conn_id, object_pat
     session.close()
 
 
+def create_minio_bucket(bucket_name, aws_conn_id, **kwargs):
+    from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+    hook = S3Hook(aws_conn_id=aws_conn_id)
+    client = hook.get_conn()
+    try:
+        client.create_bucket(Bucket=bucket_name)
+        print(f"✅ Bucket '{bucket_name}' created or already exists.")
+    except client.exceptions.BucketAlreadyOwnedByYou:
+        print(f"ℹ Bucket '{bucket_name}' already exists. Skipping creation.")
+    except Exception as e:
+        print(f"⚠ Failed to create bucket '{bucket_name}': {e}")
+        raise
+
 
 BUCKET_NAME = "news-bucket"
 AWS_CONN_ID = "MINIO_S3"
@@ -211,11 +224,17 @@ with DAG(
     }
 ) as dag:
 
-    create_news_bucket = S3CreateBucketOperator(
+    create_news_bucket = PythonOperator(
         task_id="create_news_bucket",
-        bucket_name=BUCKET_NAME,
-        aws_conn_id=AWS_CONN_ID,
+        python_callable=create_minio_bucket,
+        op_kwargs={"bucket_name": BUCKET_NAME, "aws_conn_id": AWS_CONN_ID},
     )
+
+    # create_news_bucket = S3CreateBucketOperator(
+    #     task_id="create_news_bucket",
+    #     bucket_name=BUCKET_NAME,
+    #     aws_conn_id=AWS_CONN_ID,
+    # )
     
     get_previous_day_task = PythonOperator(
         task_id='get_previous_day',
