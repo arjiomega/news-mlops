@@ -20,6 +20,7 @@ x-airflow-common:
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
     AIRFLOW_CONN_MINIO_S3: ${AIRFLOW_CONN_MINIO_S3:-}
     AIRFLOW_VAR_NEWSAPI_API_KEY: ${AIRFLOW_VAR_NEWSAPI_API_KEY:-}
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET}
   # volumes:
   #   - airflow-logs:/opt/airflow/logs
   user: "${AIRFLOW_UID:-50000}:0"

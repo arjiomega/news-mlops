@@ -87,5 +87,7 @@ AIRFLOW_CONN_MINIO_S3='{
     }
 }'
 AIRFLOW_VAR_NEWSAPI_API_KEY=<NEWSAPI_API_KEY>
+AIRFLOW__API_AUTH__JWT_SECRET=
 ```
 - the `postgresql-omegaserver` is container name from `docker-compose-psql.yaml`
+- generate `JWT_SECRET` using `openssl rand -base64 16`. (this is a fix for a problem i am experiencing in my home server where airflow worker is failing)
