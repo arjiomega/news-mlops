@@ -23,6 +23,7 @@ x-airflow-common:
     AIRFLOW_VAR_NEWSAPI_API_KEY: ${AIRFLOW_VAR_NEWSAPI_API_KEY:-}
   volumes:
     - airflow-logs:/opt/airflow/logs # Named Docker Volume
+    - airflow-config:/opt/airflow/config # Named Docker Volume
   user: "${AIRFLOW_UID:-50000}:0"
   networks:
     - postgresql-network
