@@ -21,7 +21,7 @@ x-airflow-common:
     AIRFLOW_CONN_MINIO_S3: ${AIRFLOW_CONN_MINIO_S3:-}
     AIRFLOW_VAR_NEWSAPI_API_KEY: ${AIRFLOW_VAR_NEWSAPI_API_KEY:-}
   volumes:
-    - airflow-logs:/opt/airflow/logs # Named Docker Volume
+    - airflow-logs:/opt/airflow/logs
   user: "${AIRFLOW_UID:-50000}:0"
   networks:
     - postgresql-network
