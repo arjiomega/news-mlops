@@ -252,3 +252,4 @@ networks:
 
 volumes:
   airflow-logs:
+  airflow-config:
