@@ -17,13 +17,11 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
-    # _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
     AIRFLOW_CONN_MINIO_S3: ${AIRFLOW_CONN_MINIO_S3:-}
     AIRFLOW_VAR_NEWSAPI_API_KEY: ${AIRFLOW_VAR_NEWSAPI_API_KEY:-}
   volumes:
     - airflow-logs:/opt/airflow/logs # Named Docker Volume
-    # - airflow-config:/opt/airflow/config # Named Docker Volume
   user: "${AIRFLOW_UID:-50000}:0"
   networks:
     - postgresql-network
@@ -252,4 +250,3 @@ networks:
 
 volumes:
   airflow-logs:
-  # airflow-config:
