@@ -248,3 +248,6 @@ networks:
     external: true
   minio-network:
     external: true
+
+volumes:
+  airflow-logs:
