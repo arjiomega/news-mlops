@@ -229,12 +229,6 @@ with DAG(
         python_callable=create_minio_bucket,
         op_kwargs={"bucket_name": BUCKET_NAME, "aws_conn_id": AWS_CONN_ID},
     )
-
-    # create_news_bucket = S3CreateBucketOperator(
-    #     task_id="create_news_bucket",
-    #     bucket_name=BUCKET_NAME,
-    #     aws_conn_id=AWS_CONN_ID,
-    # )
     
     get_previous_day_task = PythonOperator(
         task_id='get_previous_day',

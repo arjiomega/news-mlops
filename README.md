@@ -23,6 +23,8 @@
     docker network create postgresql-network
     docker network create redis-network
     docker network create minio-network
+    docker network create ollama-network
+    docker network create embedding-preprocessor-api
 
     sudo docker compose \
         -f docker-compose-psql.yaml \
@@ -32,6 +34,8 @@
         -f docker-compose-bare.yaml \
         --env-file .airflow.env \
         -f docker-compose-redis.yaml \
+        -f docker-compose-embedding.yaml \
+        -f docker-compose-ollama.yaml \
         up -d --build
     ```
 
@@ -88,6 +92,10 @@ AIRFLOW_CONN_MINIO_S3='{
 }'
 AIRFLOW_VAR_NEWSAPI_API_KEY=<NEWSAPI_API_KEY>
 AIRFLOW__API_AUTH__JWT_SECRET=
+AIRFLOW_VAR_OLLAMA_MODEL='deepseek-r1:8b'
+AIRFLOW_VAR_OLLAMA_ENDPOINT=http://ollama:11434
+AIRFLOW_CONN_OLLAMA_API=http://ollama:11434
 ```
 - the `postgresql-omegaserver` is container name from `docker-compose-psql.yaml`
 - generate `JWT_SECRET` using `openssl rand -base64 16`. (this is a fix for a problem i am experiencing in my home server where airflow worker is failing)
+- replace AIRFLOW_VAR_OLLAMA_ENDPOINT with the endpoint if you are planning to run this in separate servers / devices. (In my case, the ollama endpoint is running in my pc)

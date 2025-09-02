@@ -28,13 +28,18 @@ class Chunk(BaseModel):
 class Chunks(BaseModel):
     chunks: list[Chunk]
 
+class ChunkRequest(BaseModel):
+    text: str
+    chunk_size: int = 250
+    chunk_overlap: int = 25
+
 @app.post("/text/get_token_count/")
 def token_count(text: str) -> int:
     return get_token_size(text)
 
 @app.post("/text/chunk/")
-def chunk_text(text: str, chunk_size: int = 250, chunk_overlap: int = 25) -> Chunks:
-    token_count = get_token_size(text)
+def chunk_text(request: ChunkRequest) -> Chunks:
+    text, chunk_size, chunk_overlap = request.text, request.chunk_size, request.chunk_overlap
 
     text_splitter = RecursiveCharacterTextSplitter.from_huggingface_tokenizer(
         tokenizer,

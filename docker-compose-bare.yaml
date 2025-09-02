@@ -21,6 +21,9 @@ x-airflow-common:
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
     AIRFLOW_CONN_MINIO_S3: ${AIRFLOW_CONN_MINIO_S3:-}
     AIRFLOW_VAR_NEWSAPI_API_KEY: ${AIRFLOW_VAR_NEWSAPI_API_KEY:-}
+    AIRFLOW_VAR_OLLAMA_MODEL: ${AIRFLOW_VAR_OLLAMA_MODEL:-}
+    AIRFLOW_VAR_OLLAMA_ENDPOINT: ${AIRFLOW_VAR_OLLAMA_ENDPOINT:-}
+    AIRFLOW_CONN_OLLAMA_API: ${AIRFLOW_CONN_OLLAMA_API:-}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -31,6 +34,8 @@ x-airflow-common:
     - postgresql-network
     - redis-network
     - minio-network
+    - ollama-network
+    - embedding-preprocessor-api
 
 services:
   airflow-apiserver:
@@ -250,4 +255,6 @@ networks:
   redis-network:
     external: true
   minio-network:
+    external: true
+  embedding-preprocessor-api:
     external: true

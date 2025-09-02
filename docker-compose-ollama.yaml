@@ -1,0 +1,23 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/var/lib/ollama
+    restart: unless-stopped
+    networks:
+      - ollama-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            capabilities: ["gpu"]
+            count: all
+volumes:
+  ollama:
+networks:
+  ollama-network:
+    external: true
