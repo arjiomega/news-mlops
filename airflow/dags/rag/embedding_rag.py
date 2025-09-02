@@ -37,8 +37,10 @@ news_sources = [
 def transform_to_chunks(text: str, chunk_size: int = 250, chunk_overlap: int = 25) -> list[dict[str,str|int]]:
     import requests
         
+    embedding_port = Variable.get("EMBEDDING_PORT")
+        
     response = requests.post(
-        "http://embedding-api:8000/text/chunk/",
+        f"http://embedding-api:{embedding_port}/text/chunk/",
         json={
             "text": text,
             "chunk_size": chunk_size,
