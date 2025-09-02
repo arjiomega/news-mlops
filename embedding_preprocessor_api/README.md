@@ -1,8 +1,8 @@
 
 
 ```bash
-docker build -t fastapi-app:latest .
-docker run -d -p 8000:8000 fastapi-app:latest
+docker build -t embedding_preprocessor:latest .
+docker run --name embedding_dev -d -p 8000:8000 embedding_preprocessor:latest
 ```
 
 ```bash
