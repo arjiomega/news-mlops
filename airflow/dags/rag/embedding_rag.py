@@ -101,9 +101,10 @@ def chunk_articles_to_bucket(
                 if attempt < max_attempts - 1:
                     time.sleep(2 ** attempt)
         
-def fetch_list_of_article_keys(news_source: str, date: str, hook: S3Hook) -> list[str]:
+def fetch_list_of_article_keys(news_source: str, date: dict[str,str], hook: S3Hook) -> list[str]:
+    date_key = f"{date['year']}/{date['month']}/{date['day']}"
     bucket_name = 'news-bucket'
-    prefix = f"{date}/{news_source}/news-htmls/"
+    prefix = f"{date_key}/{news_source}/news-htmls/"
     return hook.list_keys(bucket_name=bucket_name, prefix=prefix)
         
 def generate_qna_pairs(
