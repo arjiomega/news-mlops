@@ -6,6 +6,10 @@
 - **Automated embedding model retraining** for Retrieval-Augmented Generation (RAG)
 - **Interactive chatbot** to ask questions and retrieve information (powered by embeddings and RAG)
 
+## DAG
+
+![load news dag](./media/load_news_dag.png)
+![rag dag](./media/rag_dag.png)
 
 ## Features
 
