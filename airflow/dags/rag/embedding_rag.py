@@ -12,8 +12,6 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
 from article_processor import article_processor_loader
 from article_processor.base import ArticleProcessor
-from airflow.sdk import Variable
-
 
 news_sources = [
     ("cnn", "sources"),
@@ -36,11 +34,9 @@ news_sources = [
 
 def transform_to_chunks(text: str, chunk_size: int = 250, chunk_overlap: int = 25) -> list[dict[str,str|int]]:
     import requests
-        
-    embedding_port = Variable.get("EMBEDDING_PORT")
-        
+                
     response = requests.post(
-        f"http://embedding-api:{embedding_port}/text/chunk/",
+        f"http://embedding-api:8000/text/chunk/",
         json={
             "text": text,
             "chunk_size": chunk_size,

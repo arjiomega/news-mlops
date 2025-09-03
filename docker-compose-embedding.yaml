@@ -3,16 +3,12 @@ services:
     build:
       context: ./embedding_preprocessor_api
       dockerfile: Dockerfile
-      args:
-        EMBEDDING_PORT: ${EMBEDDING_PORT_ENV:-8000}
     container_name: embedding-api
     networks:
       - embedding-preprocessor-api
-    ports:
-      - "${EMBEDDING_PORT:-8000}:${EMBEDDING_PORT_ENV:-8000}"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$$EMBEDDING_PORT/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
