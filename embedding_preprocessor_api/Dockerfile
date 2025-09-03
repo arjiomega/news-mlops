@@ -3,6 +3,8 @@ FROM python:3.12-slim
 # Prevent writing .pyc files and allow logs to show in docker logs
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ARG EMBEDDING_PORT=8000
+ENV EMBEDDING_PORT=$EMBEDDING_PORT
 
 WORKDIR /app
 
@@ -18,7 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose port
-EXPOSE 8000
+EXPOSE $EMBEDDING_PORT
 
 # Start FastAPI with uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${EMBEDDING_PORT}"]
