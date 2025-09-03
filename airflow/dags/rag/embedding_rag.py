@@ -52,10 +52,11 @@ def chunk_articles_to_bucket(
     list_of_article_keys: list[str], 
     hook: S3Hook, 
     article_processor: ArticleProcessor
-    ):
+    ) -> list[str]:
     import json
     
     bucket_name = 'news-bucket'
+    jsonl_keys = []
 
     for key in list_of_article_keys:
         html_content: str = hook.read_key(key, bucket_name=bucket_name)
@@ -91,11 +92,14 @@ def chunk_articles_to_bucket(
                     replace=True
                 )
                 print(f"Successfully uploaded {jsonl_key} to {bucket_name}")
+                jsonl_keys.append(jsonl_key)
                 break
             except Exception as e:
                 print(f"Attempt {attempt + 1} failed to upload {jsonl_key}: {e}")
                 if attempt < max_attempts - 1:
                     time.sleep(2 ** attempt)
+        
+    return jsonl_keys
         
 def fetch_list_of_article_keys(news_source: str, date: dict[str,str], hook: S3Hook) -> list[str]:
     date_key = f"{date['year']}/{date['month']}/{date['day']}"
@@ -104,8 +108,7 @@ def fetch_list_of_article_keys(news_source: str, date: dict[str,str], hook: S3Ho
     return hook.list_keys(bucket_name=bucket_name, prefix=prefix)
         
 def generate_qna_pairs(
-    date: str, 
-    news_source: str,
+    list_of_chunked_article_keys: list[str],
     hook: S3Hook
     ):
     import time
@@ -113,10 +116,7 @@ def generate_qna_pairs(
     from qna_generator.qna_generator import generate_questions
     
     bucket_name = 'news-bucket'
-    prefix = f"{date}/{news_source}/article-chunks/"
-    list_of_chunked_article_keys = hook.list_keys(bucket_name=bucket_name, prefix=prefix)
-    
-        
+  
     for key in list_of_chunked_article_keys:
         start_time = time.time()
         
@@ -209,16 +209,16 @@ with DAG(
         with TaskGroup(group_id=f'news_source_{news_source}') as task_group:
             
             
-            # wait_for_news = ExternalTaskSensor(
-            #     task_id=f'wait_for_news__{news_source}',
-            #     external_dag_id='load_news_dag',
-            #     external_task_group_id=f'news_source_{news_source}',
-            #     allowed_states=['success'],
-            #     failed_states=['failed'],
-            #     poke_interval=60,
-            #     timeout=7200,
-            #     mode='reschedule'
-            # )
+            wait_for_news = ExternalTaskSensor(
+                task_id=f'wait_for_news__{news_source}',
+                external_dag_id='load_news_dag',
+                external_task_group_id=f'news_source_{news_source}',
+                allowed_states=['success'],
+                failed_states=['failed'],
+                poke_interval=60,
+                timeout=7200,
+                mode='reschedule'
+            )
             
             fetch_list_of_article_keys_task = PythonOperator(
                 task_id=f'fetch_list_of_article_keys__{news_source}',
@@ -237,11 +237,11 @@ with DAG(
             generate_qna_pairs_task = PythonOperator(
                 task_id=f'generate_qna_pairs__{news_source}',
                 python_callable=generate_qna_pairs,
-                op_args=[get_previous_day_task.output, news_source, hook],
+                op_args=[chunk_articles_to_bucket_task.output, hook],
             )
             
-            # wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
-            fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
+            wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
+            # fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
             
             
         grouped_tasks.append(task_group)
