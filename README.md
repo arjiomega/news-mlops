@@ -99,6 +99,7 @@ AIRFLOW__API_AUTH__JWT_SECRET=
 AIRFLOW_VAR_OLLAMA_MODEL='deepseek-r1:8b'
 AIRFLOW_VAR_OLLAMA_ENDPOINT=http://ollama:11434
 AIRFLOW_CONN_OLLAMA_API=http://ollama:11434
+AIRFLOW_VAR_ENVIRONMENT=demo
 ```
 - the `postgresql-omegaserver` is container name from `docker-compose-psql.yaml`
 - generate `JWT_SECRET` using `openssl rand -base64 16`. (this is a fix for a problem i am experiencing in my home server where airflow worker is failing)
