@@ -3,6 +3,7 @@ from airflow.providers.standard.operators.python import PythonOperator
 from airflow.sensors.external_task import ExternalTaskSensor
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.utils.task_group import TaskGroup
+from airflow.sdk import Variable
 from datetime import datetime, timedelta
 import time
 
@@ -184,6 +185,7 @@ with DAG(
     
     
     hook = S3Hook(aws_conn_id="MINIO_S3")
+    ENVIRONMENT = Variable.get("ENVIRONMENT") # [home, demo]
     
     get_previous_day_task = PythonOperator(
         task_id='get_previous_day',
@@ -240,9 +242,13 @@ with DAG(
                 op_args=[chunk_articles_to_bucket_task.output, hook],
             )
             
-            wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task
-            
+            if ENVIRONMENT == "home":
+                wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task
+            elif ENVIRONMENT == "demo":
+                wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
+            else:
+                raise ValueError(f"{ENVIRONMENT} is an invalid Environment. Set it to either 'home' or 'demo'.")
             
         grouped_tasks.append(task_group)
 
-    get_previous_day_task >> grouped_tasks
+    get_previous_day_task >> check_ollama_api >> grouped_tasks
