@@ -240,10 +240,9 @@ with DAG(
                 op_args=[chunk_articles_to_bucket_task.output, hook],
             )
             
-            wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
-            # fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
+            wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task
             
             
         grouped_tasks.append(task_group)
 
-    get_previous_day_task >> check_ollama_api >> grouped_tasks
+    get_previous_day_task >> grouped_tasks
