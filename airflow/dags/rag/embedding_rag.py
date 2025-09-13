@@ -251,4 +251,10 @@ with DAG(
             
         grouped_tasks.append(task_group)
 
-    get_previous_day_task >> check_ollama_api >> grouped_tasks
+    if ENVIRONMENT == "home":
+        get_previous_day_task >> grouped_tasks
+    elif ENVIRONMENT == "demo":
+        get_previous_day_task >> check_ollama_api >> grouped_tasks
+    else:
+        raise ValueError(f"{ENVIRONMENT} is an invalid Environment. Set it to either 'home' or 'demo'.")
+    
