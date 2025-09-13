@@ -215,17 +215,17 @@ with DAG(
         
         with TaskGroup(group_id=f'news_source_{news_source}') as task_group:
             
-            wait_for_news = ExternalTaskSensor(
-                task_id=f'wait_for_news__{news_source}',
-                external_dag_id='load_news_dag',
-                external_task_group_id=f'news_source_{news_source}',
-                allowed_states=['success'],
-                failed_states=['failed'],
-                poke_interval=60,
-                timeout=7200,
-                mode='reschedule',
-                skip_when_missing=True
-            )
+            # TEMPORARILY DISABLE FOR BACKFILLING WITH NO DAG HISTORY
+            # wait_for_news = ExternalTaskSensor(
+            #     task_id=f'wait_for_news__{news_source}',
+            #     external_dag_id='load_news_dag',
+            #     external_task_group_id=f'news_source_{news_source}',
+            #     allowed_states=['success'],
+            #     failed_states=['failed'],
+            #     poke_interval=60,
+            #     timeout=7200,
+            #     mode='reschedule'
+            # )
             
             fetch_list_of_article_keys_task = PythonOperator(
                 task_id=f'fetch_list_of_article_keys__{news_source}',
@@ -242,14 +242,16 @@ with DAG(
             )
             
             if ENVIRONMENT == "home":
-                wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task
+                # wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task
+                fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task
             else:
                 generate_qna_pairs_task = PythonOperator(
                     task_id=f'generate_qna_pairs__{news_source}',
                     python_callable=generate_qna_pairs,
                     op_args=[chunk_articles_to_bucket_task.output, hook],
                 )
-                wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
+                # wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
+                fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
             
         grouped_tasks.append(task_group)
 
