@@ -185,24 +185,28 @@ with DAG(
     
     
     hook = S3Hook(aws_conn_id="MINIO_S3")
-    ENVIRONMENT = Variable.get("ENVIRONMENT") # [home, demo]
+    ENVIRONMENT = Variable.get("ENVIRONMENT")
+    
+    if ENVIRONMENT not in ("home", "demo"):
+        raise ValueError(f"{ENVIRONMENT} is an invalid Environment. Set it to either 'home' or 'demo'.")
+    
     
     get_previous_day_task = PythonOperator(
         task_id='get_previous_day',
         python_callable=get_previous_day
     )
 
- 
-    check_ollama_api = HttpSensor(
-        task_id="check_api_health",
-        http_conn_id="ollama_api",  # set up in Airflow Connections UI
-        endpoint="/api/version", # e.g. GET https://api.example.com/health
-        poke_interval=300,                  # check every 30s
-        timeout=1800,                       # fail after 5 min
-        mode="reschedule",
-        retries=24,
-        retry_delay=timedelta(hours=1),
-    )
+    if ENVIRONMENT == "demo":
+        check_ollama_api = HttpSensor(
+            task_id="check_api_health",
+            http_conn_id="ollama_api",  # set up in Airflow Connections UI
+            endpoint="/api/version", # e.g. GET https://api.example.com/health
+            poke_interval=300,                  # check every 30s
+            timeout=1800,                       # fail after 5 min
+            mode="reschedule",
+            retries=24,
+            retry_delay=timedelta(hours=1),
+        )
  
     grouped_tasks = []
  
@@ -236,25 +240,19 @@ with DAG(
                 op_args=[fetch_list_of_article_keys_task.output, hook, article_processor],
             )
             
-            generate_qna_pairs_task = PythonOperator(
-                task_id=f'generate_qna_pairs__{news_source}',
-                python_callable=generate_qna_pairs,
-                op_args=[chunk_articles_to_bucket_task.output, hook],
-            )
-            
             if ENVIRONMENT == "home":
                 wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task
-            elif ENVIRONMENT == "demo":
-                wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
             else:
-                raise ValueError(f"{ENVIRONMENT} is an invalid Environment. Set it to either 'home' or 'demo'.")
+                generate_qna_pairs_task = PythonOperator(
+                    task_id=f'generate_qna_pairs__{news_source}',
+                    python_callable=generate_qna_pairs,
+                    op_args=[chunk_articles_to_bucket_task.output, hook],
+                )
+                wait_for_news >> fetch_list_of_article_keys_task >> chunk_articles_to_bucket_task >> generate_qna_pairs_task
             
         grouped_tasks.append(task_group)
 
     if ENVIRONMENT == "home":
         get_previous_day_task >> grouped_tasks
-    elif ENVIRONMENT == "demo":
-        get_previous_day_task >> check_ollama_api >> grouped_tasks
     else:
-        raise ValueError(f"{ENVIRONMENT} is an invalid Environment. Set it to either 'home' or 'demo'.")
-    
+        get_previous_day_task >> check_ollama_api >> grouped_tasks
