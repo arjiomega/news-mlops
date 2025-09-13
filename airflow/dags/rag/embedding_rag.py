@@ -183,6 +183,7 @@ with DAG(
     }
 ) as dag:
     
+    import os
     
     hook = S3Hook(aws_conn_id="MINIO_S3")
     ENVIRONMENT = Variable.get("ENVIRONMENT")
@@ -214,7 +215,6 @@ with DAG(
         
         with TaskGroup(group_id=f'news_source_{news_source}') as task_group:
             
-            
             wait_for_news = ExternalTaskSensor(
                 task_id=f'wait_for_news__{news_source}',
                 external_dag_id='load_news_dag',
@@ -223,7 +223,8 @@ with DAG(
                 failed_states=['failed'],
                 poke_interval=60,
                 timeout=7200,
-                mode='reschedule'
+                mode='reschedule',
+                skip_when_missing=True
             )
             
             fetch_list_of_article_keys_task = PythonOperator(
